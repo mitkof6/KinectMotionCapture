@@ -70,6 +70,7 @@ Skeleton::Skeleton(void){
 	OPENSIM_IK_SETTINGS = ini.Get("path", "OPENSIM_IK_SETTINGS", ""); 
 	OPENSIM_ID_DYNAMICS = ini.Get("path", "OPENSIM_ID_DYNAMICS", ""); 
 	SEGMENTS_AVG_PATH = ini.Get("path", "SEGMENTS_AVG_PATH", "");
+	SENSOR_TRAJECTORY = ini.Get("path", "SENSOR_TRAJECTORY", "");
 
 	string iniMarkers  = ini.Get("openSimMarkers", "MARKERS", "");  
     stringstream ss(iniMarkers);
@@ -77,6 +78,15 @@ Skeleton::Skeleton(void){
     while (ss >> buf){
         markersNames.push_back(buf);
 	}
+
+	iniMarkers  = ini.Get("sensor", "MARKERS", "");  
+    ss = stringstream(iniMarkers);
+	buf = "";
+    while (ss >> buf){
+        sensorNames.push_back(buf);
+	}
+
+	
 
 }
 
@@ -103,7 +113,7 @@ void Skeleton::draw(){
 			glLineWidth(BONE_WIDTH);
 			drawBone(skeletonSequence.back(), pairs[i][0], pairs[i][1]);	
 			glLineWidth(1);
-			drawBoneOrientation(skeletonBoneOrientation.back(), skeletonSequence.back());
+			//drawBoneOrientation(skeletonBoneOrientation.back(), skeletonSequence.back());
 		}
 
 		//draw joints
@@ -125,7 +135,7 @@ void Skeleton::draw(){
 			glLineWidth(BONE_WIDTH);
 			drawBone(skeletonSequence.back(), pairs[i][0], pairs[i][1]);	
 			glLineWidth(1);
-			drawBoneOrientation(skeletonBoneOrientation.back(), skeletonSequence.back());
+			//drawBoneOrientation(skeletonBoneOrientation.back(), skeletonSequence.back());
 		}
 
 		//draw joints
@@ -306,7 +316,7 @@ void Skeleton::update(){
 }
 
 void Skeleton::addFrame(const NUI_SKELETON_DATA &data, const NUI_SKELETON_BONE_ORIENTATION orientaion[],
-	double &elapsedTime, long int &time_stamp){
+	double &elapsedTime, SYSTEMTIME &time_stamp){
 	
 	double tem_time;
 
@@ -327,6 +337,42 @@ void Skeleton::addFrame(const NUI_SKELETON_DATA &data, const NUI_SKELETON_BONE_O
 
 	timeStamp.push_back(time_stamp);
 
+}
+
+void Skeleton::saveSensorTrajectory(){
+	if(skeletonSequence.size() == 0){
+		return;
+	}
+
+	FILE *f = fopen(SENSOR_TRAJECTORY.c_str(), "w");
+	if(f == NULL){
+		printf("Can't open file\n");
+		return;
+	}
+
+	for(unsigned i = 0;i<skeletonSequence.size();i++){
+		
+		if(i<SKIP_FRAMES){
+			continue;
+		}
+		
+		//fprintf(f, "%ld\t", timeStamp[i]);
+		SYSTEMTIME t = timeStamp[i];
+		fprintf(f, "%02d%02d%02d%03d\t", t.wHour, t.wMinute, t.wSecond, t.wMilliseconds);
+
+		for(int j = 0;j<sensorNames.size();j++){
+			Vector4 pos = skeletonSequence[i].SkeletonPositions[markers[sensorNames[j]]];
+			pos.x = pos.x ;
+			pos.y = pos.y - floorY;
+			pos.z = pos.z;
+
+			fprintf(f, "%f\t%f\t%f\t", MARKERS_SCALE*pos.x, MARKERS_SCALE*pos.y, MARKERS_SCALE*pos.z);
+		}
+
+		fprintf(f, "\n");
+	}
+
+	fclose(f);
 }
 
 void Skeleton::saveVectorToBinary(){
@@ -374,8 +420,8 @@ void Skeleton::saveToMatlab(){
 				os.open (MATLAB_X_PATH.c_str());
 
 				for(unsigned i = 0;i<skeletonSequence.size();i++){
-					os << timeStamp[i] << "\t";
-					os << frameTime[i] << "\t";
+					/*os << timeStamp[i] << "\t";
+					os << frameTime[i] << "\t";*/
 					for(unsigned int j = 0;j<JOINTS;j++){
 						os << skeletonSequence[i].SkeletonPositions[j].x << "\t";
 					}
@@ -391,8 +437,8 @@ void Skeleton::saveToMatlab(){
 				os.open (MATLAB_Y_PATH.c_str());
 
 				for(unsigned int i = 0;i<skeletonSequence.size();i++){
-					os << timeStamp[i] << "\t";
-					os << frameTime[i] << "\t";
+					/*os << timeStamp[i] << "\t";
+					os << frameTime[i] << "\t";*/
 					for(int j = 0;j<JOINTS;j++){
 						os << skeletonSequence[i].SkeletonPositions[j].y << "\t";
 					}
@@ -408,8 +454,8 @@ void Skeleton::saveToMatlab(){
 				os.open (MATLAB_Z_PATH.c_str());
 
 				for(unsigned int i = 0;i<skeletonSequence.size();i++){
-					os << timeStamp[i] << "\t";
-					os << frameTime[i] << "\t";
+					/*os << timeStamp[i] << "\t";
+					os << frameTime[i] << "\t";*/
 					for(int j = 0;j<JOINTS;j++){
 						os << skeletonSequence[i].SkeletonPositions[j].z << "\t";
 					}
@@ -425,8 +471,8 @@ void Skeleton::saveToMatlab(){
 				os.open (MATLAB_W_PATH.c_str());
 
 				for(unsigned int i = 0;i<skeletonSequence.size();i++){
-					os << timeStamp[i] << "\t";
-					os << frameTime[i] << "\t";
+					/*os << timeStamp[i] << "\t";
+					os << frameTime[i] << "\t";*/
 					for(int j = 0;j<JOINTS;j++){
 						os << skeletonSequence[i].SkeletonPositions[j].w << "\t";
 					}

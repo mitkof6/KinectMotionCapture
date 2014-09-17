@@ -270,6 +270,10 @@ void Viewer::keyboard (unsigned char key, int x, int y){
 		kinect.skeleton.saveMotionToOpenSim(kinect.getSkeletonFrameRate());
 		std::cout << "Trajectory file saved to OpenSim format\n"; 
 		break;
+	case 'h':
+		kinect.skeleton.saveSensorTrajectory();
+		std::cout << "Sensor trajectory file saved\n"; 
+		break;
 	case 'c':
 		if(kinect.skeleton.animate == true) return;
 		kinect.skeleton.clearData();
@@ -363,9 +367,10 @@ void Viewer::showInfo(){
 	drawString("Key l: Load Skel", 0, WINDOW_HEIGHT-3*TEXT_HEIGHT, color, GLUT_BITMAP_HELVETICA_12);
 	drawString("Key m: Save Matlab", 0, WINDOW_HEIGHT-4*TEXT_HEIGHT, color, GLUT_BITMAP_HELVETICA_12);
 	drawString("Key o: Save Trc", 0, WINDOW_HEIGHT-5*TEXT_HEIGHT, color, GLUT_BITMAP_HELVETICA_12);
-	drawString("Key c: Clear Data", 0, WINDOW_HEIGHT-6*TEXT_HEIGHT, color, GLUT_BITMAP_HELVETICA_12);
-	drawString("Key p: Replay data", 0, WINDOW_HEIGHT-7*TEXT_HEIGHT, color, GLUT_BITMAP_HELVETICA_12);
-	drawString("Key b: Segment lengths", 0, WINDOW_HEIGHT-8*TEXT_HEIGHT, color, GLUT_BITMAP_HELVETICA_12);
+	drawString("Key o: Save Sensor", 0, WINDOW_HEIGHT-6*TEXT_HEIGHT, color, GLUT_BITMAP_HELVETICA_12);
+	drawString("Key c: Clear Data", 0, WINDOW_HEIGHT-7*TEXT_HEIGHT, color, GLUT_BITMAP_HELVETICA_12);
+	drawString("Key p: Replay data", 0, WINDOW_HEIGHT-8*TEXT_HEIGHT, color, GLUT_BITMAP_HELVETICA_12);
+	drawString("Key b: Segment lengths", 0, WINDOW_HEIGHT-9*TEXT_HEIGHT, color, GLUT_BITMAP_HELVETICA_12);
 
 	drawString("Movements: w, s, a, d", 0, 0, color, GLUT_BITMAP_HELVETICA_12);
 	drawString("Camera rotation: mouse",  0, TEXT_HEIGHT, color, GLUT_BITMAP_HELVETICA_12);
@@ -422,10 +427,14 @@ void Viewer::timerDispacher(int i){
 		case 3:
 			instance->kinect.skeleton.saveSegmentLengths();
 			break;
+		case 4:
+			instance->kinect.skeleton.saveSensorTrajectory();
+			break;
 		default:
 			instance->kinect.skeleton.saveMotionToOpenSim(instance->kinect.getSkeletonFrameRate());
 			instance->kinect.skeleton.saveToMatlab();
 			instance->kinect.skeleton.saveSegmentLengths();
+			instance->kinect.skeleton.saveSensorTrajectory();
 			break;
 	}
 	

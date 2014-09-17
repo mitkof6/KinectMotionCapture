@@ -110,10 +110,7 @@ HRESULT Kinect::connect(){
         hr = sensor->NuiInitialize(NUI_INITIALIZE_FLAG_USES_SKELETON |
 			NUI_INITIALIZE_FLAG_USES_COLOR); 
         if (SUCCEEDED(hr)){
-
-			timeStamp = std::time(0);
-			std::cout << "System time when sensor initialized: " << timeStamp << "\n";
-
+			
 			// Create an event that will be signaled when skeleton data is available
             skeletonHandle = CreateEventW(NULL, TRUE, FALSE, NULL);
 
@@ -203,8 +200,10 @@ void Kinect::prosessSkeletonData(){
 		
         if (NUI_SKELETON_TRACKED == trackingState){
             // We're tracking the skeleton, draw it
-			timeStamp = std::time(0);
-			skeleton.addFrame(skeletonFrame.SkeletonData[i], boneOrientations, elapsed_secs, timeStamp);
+			SYSTEMTIME t;
+			GetLocalTime(&t);
+			
+			skeleton.addFrame(skeletonFrame.SkeletonData[i], boneOrientations, elapsed_secs, t);
         }else if (NUI_SKELETON_POSITION_ONLY == trackingState){
             // we've only received the center point of the skeleton, draw that
             /*D2D1_ELLIPSE ellipse = D2D1::Ellipse(
@@ -214,8 +213,9 @@ void Kinect::prosessSkeletonData(){
                 );
 
             m_pRenderTarget->DrawEllipse(ellipse, m_pBrushJointTracked);*/
-			timeStamp = std::time(0);
-			skeleton.addFrame(skeletonFrame.SkeletonData[i], boneOrientations, elapsed_secs, timeStamp);
+			SYSTEMTIME t;
+			GetLocalTime(&t);
+			skeleton.addFrame(skeletonFrame.SkeletonData[i], boneOrientations, elapsed_secs, t);
         }
     }
 

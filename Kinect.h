@@ -4,6 +4,7 @@
 #include <Windows.h>
 #include <iostream>
 #include <ctime>
+#include <string>
 
 #include <GL/glut.h>
 #include <NuiApi.h>

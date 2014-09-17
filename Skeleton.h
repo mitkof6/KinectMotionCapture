@@ -50,7 +50,13 @@ public:
 	/**
 	* Adds data and arrival time coming from sensor
 	*/
-	void addFrame(const NUI_SKELETON_DATA &data, const NUI_SKELETON_BONE_ORIENTATION orientaion[], double &elapsedTime, long int &timeStamp);
+	void addFrame(const NUI_SKELETON_DATA &data, const NUI_SKELETON_BONE_ORIENTATION orientaion[], double &elapsedTime, SYSTEMTIME &timeStamp);
+
+
+	/**
+	* Saves to text format
+	*/
+	void saveSensorTrajectory();
 
 	/**
 	* Saves to raw binnary format
@@ -91,7 +97,7 @@ private:
 	* Keeps track of arrival time
 	*/
 	vector<double> frameTime;
-	vector<long int> timeStamp;
+	vector<SYSTEMTIME> timeStamp;
 
 	/**
 	* Skeleton frame data
@@ -116,7 +122,7 @@ private:
 	/**
 	* Markers names
 	*/
-	vector<string> markersNames;
+	vector<string> markersNames, sensorNames;
 
 	/**
 	* Current animated frame
@@ -135,7 +141,8 @@ private:
 		MATLAB_X_PATH, MATLAB_Y_PATH, MATLAB_Z_PATH, MATLAB_W_PATH,
 		OPENSIM_MOTION_FILE, OPENSIM_SCALE_SETTINGS, 
 		OPENSIM_IK_SETTINGS, OPENSIM_ID_DYNAMICS,
-		SEGMENTS_AVG_PATH;
+		SEGMENTS_AVG_PATH,
+		SENSOR_TRAJECTORY;
 
 	/**
 	* Euclidean distance
